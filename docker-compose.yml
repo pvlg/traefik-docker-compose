@@ -1,0 +1,35 @@
+name: traefik
+
+services:
+
+  traefik:
+    image: traefik:3
+    container_name: traefik
+    command:
+      - "--global.sendanonymoususage=false"
+
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+
+      - "--api.insecure=true"
+
+      - "--log.maxage=7"
+      - "--log.level=INFO"
+
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+    restart: unless-stopped
+    networks:
+      - traefik
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+networks:
+  traefik:
+    external: true
