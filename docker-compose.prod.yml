@@ -1,0 +1,46 @@
+name: traefik
+
+services:
+
+  traefik:
+    image: traefik:3
+    container_name: traefik
+    command:
+      - "--global.sendanonymoususage=false"
+
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik"
+
+      - "--api.insecure=true"
+
+      - "--log.maxage=7"
+      - "--log.level=INFO"
+
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+
+      - "--certificatesresolvers.le.acme.email=${EMAIL:-your-email@example.com}"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    restart: unless-stopped
+    networks:
+      - traefik
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+
+volumes:
+  letsencrypt:
+    driver: local
+    name: ${COMPOSE_PROJECT_NAME}-letsencrypt
+
+networks:
+  traefik:
+    external: true

@@ -1,0 +1,11 @@
+http:
+  routers:
+    local-traefik:
+      rule: "Host(`traefik.docker.test`)"
+      tls: true
+      service: "api@internal"
+
+tls:
+  certificates:
+    - certFile: "/etc/certs/_wildcard.docker.test.pem"
+      keyFile: "/etc/certs/_wildcard.docker.test-key.pem"
